@@ -6,9 +6,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang='en'>
       <body className={`${inter.className} antialiased`}>
         {/* Alert */}
-        <div className='bg-yellow-400 text-black p-2 text-center'>
+        {/* Only shared among /app/routes not deeper */}
+        {/* <div className='bg-yellow-400 text-black p-2 text-center'>
           <p>Alert: Your account is due for renewal.</p>
-        </div>
+        </div> */}
         {children}
       </body>
     </html>
