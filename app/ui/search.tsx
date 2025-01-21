@@ -13,6 +13,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
 
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
+    params.set('page', '1');
 
     if (term) {
       params.set('query', term);
@@ -22,20 +23,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
 
     // Replace the current URL with the new search term
     replace(`${pathname}?${params.toString()}`);
-  }, 2000);
-
-  // function handleSearchs(term: string) {
-  //   const params = new URLSearchParams(searchParams);
-
-  //   if (term) {
-  //     params.set('query', term);
-  //   } else {
-  //     params.delete('query');
-  //   }
-
-  //   // Replace the current URL with the new search term
-  //   replace(`${pathname}?${params.toString()}`);
-  // }
+  }, 700);
 
   return (
     <div className='relative flex flex-1 flex-shrink-0'>
