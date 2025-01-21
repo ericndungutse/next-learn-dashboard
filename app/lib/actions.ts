@@ -32,6 +32,6 @@ export async function createInvoice(formData: FormData) {
   `;
 
   //   Will not do a thing for a dynamic page
-  revalidatePath('/dashboard/invoices');
+  //   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
 }
