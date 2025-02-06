@@ -18,7 +18,6 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
   };
 
   const [state, formAction, pending] = useActionState(createInvoice, initialState);
-  console.log(pending);
 
   return (
     <form action={formAction}>

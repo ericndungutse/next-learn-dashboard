@@ -1,6 +1,8 @@
 import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 
+// .auth: Accesses the auth property of the object returned by NextAuth(). As we know, this property is a function that allows you to get the current session on the server.
+
 export default NextAuth(authConfig).auth;
 
 export const config = {
