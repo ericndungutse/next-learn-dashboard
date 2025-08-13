@@ -7,12 +7,22 @@ import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import bcrypt from 'bcrypt';
 
 export type State = {
   errors?: {
     customerId?: string[];
     amount?: string[];
     status?: string[];
+  };
+  message?: string | null;
+};
+
+export type SignupState = {
+  errors?: {
+    name?: string[];
+    email?: string[];
+    password?: string[];
   };
   message?: string | null;
 };
@@ -28,6 +38,12 @@ const FormSchema = z.object({
     invalid_type_error: 'Please select a valid status',
   }),
   date: z.string(),
+});
+
+const SignupSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(255, 'Name must be less than 255 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters long'),
 });
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
@@ -112,4 +128,50 @@ export async function aunthenticate(prevState: string | undefined, formData: For
 
   const redirectTo = (formData.get('redirectTo') as string) || '/dashboard';
   redirect(redirectTo);
+}
+
+export async function signup(prevState: SignupState, formData: FormData): Promise<SignupState> {
+  // Validate fields
+  const validatedFields = SignupSchema.safeParse({
+    name: formData.get('name'),
+    email: formData.get('email'),
+    password: formData.get('password'),
+  });
+
+  // If form validation fails, return errors early
+  if (!validatedFields.success) {
+    return { 
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Please correct the errors below.'
+    };
+  }
+
+  const { name, email, password } = validatedFields.data;
+
+  try {
+    // Check if user already exists
+    const existingUser = await sql`SELECT id FROM users WHERE email = ${email}`;
+    if (existingUser.rows.length > 0) {
+      return {
+        message: 'A user with this email already exists.'
+      };
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert the new user
+    await sql`
+      INSERT INTO users (name, email, password)
+      VALUES (${name}, ${email}, ${hashedPassword})
+    `;
+
+    // Success - redirect to login
+    redirect('/login?message=Account created successfully. Please log in.');
+  } catch (error) {
+    console.error('Signup error:', error);
+    return {
+      message: 'An error occurred while creating your account. Please try again.'
+    };
+  }
 }
