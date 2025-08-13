@@ -7,10 +7,12 @@ import { Button } from './button';
 import { aunthenticate } from '../lib/actions';
 import { useActionState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const message = searchParams.get('message');
   const [errorMessage, formAction, isPending] = useActionState(aunthenticate, undefined);
 
   return (
@@ -57,12 +59,26 @@ export default function LoginForm() {
           Log in <ArrowRightIcon className='ml-auto h-5 w-5 text-gray-50' />
         </Button>
         <div className='flex h-8 items-end space-x-1'>
+          {message && (
+            <>
+              <ExclamationCircleIcon className='h-5 w-5 text-green-500' />
+              <p className='text-sm text-green-500'>{message}</p>
+            </>
+          )}
           {errorMessage && (
             <>
               <ExclamationCircleIcon className='h-5 w-5 text-red-500' />
               <p className='text-sm text-red-500'>{errorMessage}</p>
             </>
           )}
+        </div>
+        <div className='mt-4 text-center'>
+          <p className='text-sm text-gray-600'>
+            Don&apos;t have an account?{' '}
+            <Link href='/signup' className='text-blue-500 hover:underline'>
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </form>
